@@ -1,10 +1,17 @@
 use halfbrown::HashMap;
 use itertools::Itertools;
+use lazy_static::lazy_static;
+use regex::Regex;
 use std::io::{BufRead, BufReader};
 use std::{env, fs::File, os::unix::net::UnixStream, path::Path, process::Command};
 use structs::{Config, Monitor, Workspace};
 
 mod structs;
+
+lazy_static! {
+    static ref TRIM_START_REGEX: Regex = Regex::new(r"(?m)\s+\(").unwrap();
+    static ref TRIM_END_REGEX: Regex = Regex::new(r"(?m)\)\s+").unwrap();
+}
 
 fn main() {
     let config = load_config();
@@ -48,7 +55,12 @@ fn print_yuck(
         result.push_str(&body);
     }
 
-    println!("{}", config.template.replace("{body}", &result))
+    let result = config.template.replace("{body}", &result);
+
+    println!(
+        "{}",
+        TRIM_END_REGEX.replace_all(TRIM_START_REGEX.replace_all(&result, "(").as_ref(), ")")
+    );
 }
 
 fn handle_event(

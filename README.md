@@ -2,7 +2,19 @@
 
 A small tool to sync Hyprland workspace status to Eww
 
-## Config example
+## Usage
+
+Use with eww literal widget, example:
+
+```yuck
+(deflisten workspace "scripts/workspace")
+(defwidget workspaces []
+  (literal :content workspace))
+```
+
+## Config
+
+Name as `config.yaml` and place at same directory with executable
 
 ```yaml
 workspaces:
